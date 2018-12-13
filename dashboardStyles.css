@@ -1,0 +1,81 @@
+body {
+    background-color: #555;
+    color: #FFF;
+}
+
+.toggleButton {
+    background-color: #AAA;
+    color: #FFF;
+}
+
+
+/* nav bar stylings*/
+ul {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+    overflow: hidden;
+    border: 1px solid #555;
+    list-style-type: none;
+    background-color: #888;
+}
+
+li {
+    margin: 0;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    text-align: center;
+}
+
+li.toggle {
+    width: 20%;
+}
+
+li.create {
+    width: 80%;
+    float:right;
+    vertical-align: center;
+    text-align: center;
+    line-height: 30px;
+}
+
+li button {
+    float: left;
+    width: 100px;
+    display: block;
+    background-color: #555555;
+    color: white;
+    border: 1px solid #444444;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    text-align: center;
+}
+
+li label.create {
+    padding-right: 0;
+}
+
+li button.create {
+    background-color: #007700;
+    color: white;
+    float: right;
+    width: 30px;
+    height: 30px;
+    display: block;
+    text-align: center;
+    padding: 6px 0;
+    border: 1px solid #444444;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+}
+
+li strong {
+    width: 100px;
+    background-color: #555555;
+    color: white;
+    border: 1px solid #444444;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    text-align: center;
+}
