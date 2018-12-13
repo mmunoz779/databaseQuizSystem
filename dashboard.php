@@ -103,19 +103,31 @@ if (isset($type)) {
         });
     });
 
+    function createButton(tabName){
+        if(tabName=="Quiz"){
+            window.location.href='createQuiz.php';
+        } else {
+            window.location.href='createStudent.php';        }
+    }
     function openTab(tabName) {
         switch (tabName) {
             case "quizzes":
                 document.getElementById("quizzes").hidden = false;
                 document.getElementById("students").hidden = true;
+                document.getElementById("createLabel").innerHTML="Create New Quiz";
+                document.getElementById("createButton").onclick=function(){createButton("Quiz");};
                 break;
             case "students":
                 document.getElementById("students").hidden = false;
                 document.getElementById("quizzes").hidden = true;
+                document.getElementById("createLabel").innerHTML="Create New Student";
+                document.getElementById("createButton").onclick=function(){createButton("Student");};
                 break;
             default:
                 document.getElementById("quizzes").hidden = false;
                 document.getElementById("students").hidden = true;
+                document.getElementById("createLabel").innerHTML="Create New Quiz";
+                document.getElementById("createButton").onclick=function(){createButton("Quiz");};
                 break;
         }
     }
