@@ -21,19 +21,27 @@ ul {
 }
 
 li {
+    position: relative;
     margin: 0;
+    float: right;
     padding-top: 8px;
     padding-bottom: 8px;
     text-align: center;
 }
 
-li.toggle {
-    width: 20%;
+li.quizToggle {
+    position: absolute;
+    left: 5px;
+}
+li.studentToggle {
+    position: absolute;
+    left: 106px;
 }
 
 li.create {
     width: 80%;
     float:right;
+    padding-right: 5px;
     vertical-align: center;
     text-align: center;
     line-height: 30px;
@@ -52,13 +60,15 @@ li button {
 }
 
 li label.create {
-    padding-right: 0;
+    padding-right: 5px;
+    float: right;
 }
 
 li button.create {
     background-color: #007700;
-    color: white;
     float: right;
+    color: white;
+    right: 10px;
     width: 30px;
     height: 30px;
     display: block;
@@ -77,5 +87,17 @@ li strong {
     border: 1px solid #444444;
     padding-top: 8px;
     padding-bottom: 8px;
+    text-align: center;
+}
+
+.tableDivs {
+    position: relative;
+    top: 25px;
+    width: available;
+}
+
+.table {
+    width: 50%;
+    justify-content: center;
     text-align: center;
 }

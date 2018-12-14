@@ -8,17 +8,20 @@
 
 $postData = file_get_contents("php://input");
 $request = json_decode($postData);
-@$type = $request->type;
+@$isPost = $request->isPost;
 
-if (isset($type)) {
+if (isset($isPost)) {
     try {
         $config = parse_ini_file("db.ini");
         $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        if ($type == 'quizzes') {
-            $data = ['quizzes' => array()];
-            foreach($dbh->query('SELECT name, createdOn, tot_points from exam') as $row){
-                array_push($data['quizzes'],['name'=>$row[0],'createdOn'=>$row[1],'tot_points'=>$row[2]]);
+        if ($isPost == 'true') {
+            $data = ['quizzes' => array(), 'students' => array()];
+            foreach ($dbh->query('SELECT name, createdOn, tot_points from exam') as $row) {
+                array_push($data['quizzes'], ['name' => $row[0], 'createdOn' => $row[1], 'tot_points' => $row[2]]);
+            }
+            foreach ($dbh->query('SELECT stu_id, major, name from student') as $row) {
+                array_push($data['students'], ['stu_id' => $row[0], 'major' => $row[1], 'name' => $row[2]]);
             }
             header('Content-Type: application/json;charset=utf-8');
             echo json_encode($data);
@@ -30,7 +33,7 @@ if (isset($type)) {
     }
 }
 ?>
-
+<!DOCTYPE html>
 <html>
 <head>
     <title>MyDashboard</title>
@@ -40,28 +43,28 @@ if (isset($type)) {
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
 </head>
-<body ng-app="dashboardApp">
+<body ng-app="dashboardApp" ng-controller="dashboardController">
 <h1><b>My Dashboard</b></h1>
 <div class="buttons">
     <ul class="buttons">
-        <li>
+        <li class="create">
+            <button id="createButton" class="create" onclick="window.location.href='createQuiz.php'">+</button>
+            <label for="createButton" class="create" id="createLabel"></label>
+        </li>
+        <li class="quizToggle">
             <button class="toggleButton" id="defaultOpen" onclick="openTab('quizzes')">
                 Quizzes
             </button>
         </li>
-        <li>
+        <li class="studentToggle">
             <button class="toggleButton" onclick="openTab('students')">
                 Students
             </button>
         </li>
-        <li class="create">
-            <label for="createButton" class="create">Create New Quiz</label>
-            <button name="createButton" class="create" onclick="window.location.href='createQuiz.php'">+</button>
-        </li>
     </ul>
 </div>
-<div class="quizzes" id="quizzes" hidden ng-controller="dashboardController">
-    <table border=1px>
+<div class="quizzes tableDivs" id="quizzes" hidden>
+    <table class="table" border="1px">
         <tr>
             <th>Quiz Name</th>
             <th>Created On</th>
@@ -74,60 +77,81 @@ if (isset($type)) {
         </tr>
     </table>
 </div>
-<div class="students" id="students" hidden>
-    <table>
+<div class="students tableDivs" id="students" hidden >
+    <table class="table" border="1px">
         <tr>
             <th>Name</th>
+            <th>Student ID</th>
             <th>Major</th>
+            <th>Grades</th>
         </tr>
-        <tr>
+        <tr ng-repeat="stu in students">
+            <td>{{stu.name}}</td>
+            <td>{{stu.stu_id}}</td>
+            <td>{{stu.major}}</td>
+            <td>
+                <button type="button" ng-click="view(stu.stu_id)">View</button>
+            </td>
         </tr>
     </table>
 </div>
 <script>
     var app = angular.module('dashboardApp', []);
     app.controller('dashboardController', ($scope, $http) => {
-        var req = $http({
+        var quizReq = $http({
             url: 'dashboard.php',
             data: {
-                type: 'quizzes'
+                isPost: 'true'
             },
             method: "POST",
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         });
-        req.success((res) => {
+        quizReq.success((res) => {
             $scope.quizzes = res.quizzes;
+            $scope.students = res.students;
         });
-        req.error((res) => {
+        quizReq.error((res) => {
             console.log('POST Error');
         });
+
+        $scope.view = (student) => {
+            window.location.href = 'students.php?student=' + student;
+        }
     });
 
-    function createButton(tabName){
-        if(tabName=="Quiz"){
-            window.location.href='createQuiz.php';
+    function createButton(tabName) {
+        if (tabName == "Quiz") {
+            window.location.href = 'createQuiz.php';
         } else {
-            window.location.href='createStudent.php';        }
+            window.location.href = 'createStudent.php';
+        }
     }
+
     function openTab(tabName) {
         switch (tabName) {
             case "quizzes":
                 document.getElementById("quizzes").hidden = false;
                 document.getElementById("students").hidden = true;
-                document.getElementById("createLabel").innerHTML="Create New Quiz";
-                document.getElementById("createButton").onclick=function(){createButton("Quiz");};
+                document.getElementById("createLabel").innerHTML = "Create New Quiz";
+                document.getElementById("createButton").onclick = function () {
+                    createButton("Quiz");
+                };
                 break;
             case "students":
                 document.getElementById("students").hidden = false;
                 document.getElementById("quizzes").hidden = true;
-                document.getElementById("createLabel").innerHTML="Create New Student";
-                document.getElementById("createButton").onclick=function(){createButton("Student");};
+                document.getElementById("createLabel").innerHTML = "Create New Student";
+                document.getElementById("createButton").onclick = function () {
+                    createButton("Student");
+                };
                 break;
             default:
                 document.getElementById("quizzes").hidden = false;
                 document.getElementById("students").hidden = true;
-                document.getElementById("createLabel").innerHTML="Create New Quiz";
-                document.getElementById("createButton").onclick=function(){createButton("Quiz");};
+                document.getElementById("createLabel").innerHTML = "Create New Quiz";
+                document.getElementById("createButton").onclick = function () {
+                    createButton("Quiz");
+                };
                 break;
         }
     }
