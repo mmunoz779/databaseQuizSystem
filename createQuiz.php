@@ -165,11 +165,7 @@ if (isset($isPost)) {
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                     });
                     request.success((response) => {
-                        if (response.success) {
-                            window.location.href = 'dashboard.php?success=true';
-                        } else {
-                            console.log(response);
-                        }
+                        window.location.href = 'dashboard.php?success=true';
                     });
                 }
             };
@@ -285,12 +281,12 @@ if (isset($isPost)) {
                 choice.correct = true; //set the clicked one to true
             };
         }
-    ).directive("limitTo", [function() {
+    ).directive("limitTo", [function () {
         return {
             restrict: "A",
-            link: function(scope, elem, attrs) {
+            link: function (scope, elem, attrs) {
                 var limit = parseInt(attrs.limitTo);
-                angular.element(elem).on("keypress", function(e) {
+                angular.element(elem).on("keypress", function (e) {
                     if (this.value.length === limit) e.preventDefault();
                 });
             }

@@ -45,7 +45,7 @@
 
         echo "</table><br>";
 
-        $percent = ($total_score / $total_possible) * 100;
+        $percent = ($total_score / ($total_possible == 0 ? 1 : $total_possible)) * 100;
 
         switch ($percent / 10) {
             case 10:
