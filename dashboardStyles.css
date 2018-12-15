@@ -89,15 +89,3 @@ li strong {
     padding-bottom: 8px;
     text-align: center;
 }
-
-.tableDivs {
-    position: relative;
-    top: 25px;
-    width: available;
-}
-
-.table {
-    width: 50%;
-    justify-content: center;
-    text-align: center;
-}

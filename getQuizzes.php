@@ -12,6 +12,7 @@ var_dump($_POST);
     <form name="myForm" method="post" action="getQuizzes.php">
         <input type="text" name="type"/>
         <button type="submit">submit</button>
+        <link rel="stylesheet" href="styles.css"/>
     </form>
 </body>
 </html>

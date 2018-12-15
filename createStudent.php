@@ -14,6 +14,7 @@
     <title>Create Student</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css"/>
     <link rel="stylesheet" href="createQuizStyle.css"/>
  </head>
 
@@ -22,6 +23,7 @@
 
 <form name="newStudent" ng-submit="submitStudent" ng-controller="submitStudentController">
     <label for="studentName" ></label>
+    <input>
 </form>
 </body>
 </html>

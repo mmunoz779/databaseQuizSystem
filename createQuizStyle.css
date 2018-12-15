@@ -1,51 +1,5 @@
-html, body {
-    height: 99%;
-    width: 99%;
-    margin: 2px;
-    background-color: #555;
-    color: #FFF;
-}
-
 #quizName {
     width: 200px;
-}
-
-.publish {
-    background-color: #007700;
-    border: #007700;
-}
-
-.cancel {
-    background-color: #AA0000;
-    border: #AA0000;
-}
-
-.remove {
-    color: white;
-    background-color: #AA0000;
-    border: #AA0000;
-    float: right;
-}
-
-.round {
-    width: 20px;
-    height: 20px;
-    display: block;
-    text-align: center;
-    padding: 1px 0;
-    border: 1px solid #444444;
-    font-size: 12px;
-    line-height: 1.428571429;
-    border-radius: 12px;
-}
-
-.rounded {
-    border-radius: 3px;
-    justify-content: center;
-    width: 50px;
-    height: 25px;
-    padding: 0;
-    font-weight: bolder;
 }
 
 label.create {

@@ -24,7 +24,14 @@ if (isset($_SESSION["loggedin"])) {
     }
 }
 ?>
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css"/>
+</head>
 <form method="POST" action="login.php">
     username: <input type="text" name="userid"/>
     <br/>
@@ -32,3 +39,4 @@ if (isset($_SESSION["loggedin"])) {
     <br/>
     <input type="submit" value="Submit"/>
 </form>
+</html>
