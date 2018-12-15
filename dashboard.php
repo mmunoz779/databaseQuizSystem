@@ -17,7 +17,7 @@ if (isset($isPost)) {
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         if ($isPost == 'true') {
             $data = ['quizzes' => array(), 'students' => array()];
-            foreach ($dbh->query('SELECT name, createdOn, tot_points from exam') as $row) {
+            foreach ($dbh->query('SELECT name,  DATE_FORMAT(createdOn,\'%c/%e/%y at %h:%i:%s %p\') createdOn, tot_points FROM exam') as $row) {
                 array_push($data['quizzes'], ['name' => $row[0], 'createdOn' => $row[1], 'tot_points' => $row[2]]);
             }
             foreach ($dbh->query('SELECT stu_id, major, name from student') as $row) {
@@ -90,7 +90,7 @@ if (isset($isPost)) {
             <td>{{stu.stu_id}}</td>
             <td>{{stu.major}}</td>
             <td>
-                <button type="button" ng-click="view(stu.stu_id)">View</button>
+                <button type="button" ng-click="view(stu)">View</button>
             </td>
         </tr>
     </table>
@@ -115,7 +115,7 @@ if (isset($isPost)) {
         });
 
         $scope.view = (student) => {
-            window.location.href = 'students.php?student=' + student;
+            window.location.href = 'student.php?student=' + student.stu_id + '&name=' + student.name;
         }
     });
 

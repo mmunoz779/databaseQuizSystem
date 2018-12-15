@@ -27,10 +27,6 @@ html, body {
     float: right;
 }
 
-#choiceHolder {
-    padding-right: 90%;
-}
-
 .round {
     width: 20px;
     height: 20px;
@@ -66,9 +62,11 @@ label.createLabel {
 button.create {
     background-color: #007700;
     color: white;
+    float: left;
 }
 
 .questionDescription {
+    clear: top;
     width: 60%;
     height: 75px;
     justify-content: left;
@@ -79,11 +77,47 @@ button.create {
 }
 
 .newControls {
-    width: 8%;
+    width: 20%;
     vertical-align: center;
+    padding-top: 10px;
     justify-content: center;
 }
 
 .strong {
     font-weight: bolder;
+}
+
+.choiceInteractors {
+    width: 300px;
+    float: right;
+}
+
+.choiceInfo {
+    float: left;
+}
+
+.choiceHolder label, .choiceHolder input, .choiceHolder button {
+    float: left;
+}
+ul {
+    margin: 0;
+    padding: 3px 0;
+}
+li {
+    list-style-type:none;
+    margin: 0;
+    padding: 3px;
+    clear:left;
+}
+
+.questionInfo {
+    float: left;
+}
+
+.questionInfo label {
+    padding-right: 5px;
+}
+
+.navigationButtonDiv {
+    clear:left;
 }

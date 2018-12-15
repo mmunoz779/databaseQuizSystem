@@ -1,0 +1,23 @@
+body {
+    background-color: #555;
+    color: #FFF;
+}
+
+.tableDivs {
+    position: relative;
+    top: 25px;
+    width: available;
+}
+
+.table {
+    width: 50%;
+    justify-content: center;
+    text-align: center;
+}
+
+.success {
+    background-color: #007700;
+    border: #007700;
+    width: 75px;
+    height: 25px;
+}
