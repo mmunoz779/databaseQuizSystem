@@ -48,25 +48,31 @@
 
         $percent = ($total_score / ($total_possible == 0 ? 1 : $total_possible)) * 100;
 
-        switch ($percent / 10) {
-            case 10:
-                $letter = "A";
-                break;
-            case 9:
-                $letter = "A";
-                break;
-            case 8:
-                $letter = 'B';
-                break;
-            case 7:
-                $letter = 'C';
-                break;
-            case 6:
-                $letter = 'D';
-                break;
-            default:
-                $letter = 'E';
-                break;
+        $percent = ($total_score == 0 && $total_possible == 0) ? '--' : $percent;
+
+        if($percent == '--') {
+            $letter = '--';
+        } else {
+            switch ($percent / 10) {
+                case 10:
+                    $letter = "A";
+                    break;
+                case 9:
+                    $letter = "A";
+                    break;
+                case 8:
+                    $letter = 'B';
+                    break;
+                case 7:
+                    $letter = 'C';
+                    break;
+                case 6:
+                    $letter = 'D';
+                    break;
+                default:
+                    $letter = 'E';
+                    break;
+            }
         }
 
         echo "<table border='1px' class='table' style='width:10%'>";

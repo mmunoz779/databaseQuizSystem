@@ -31,6 +31,15 @@ if (isset($isPost)) {
                 $stmt->execute(array(':examName' => $name, ':identifier' => $identifier, ':qnum' => $qnum, ':txt' => $text, ':correct' => $correct));
             }
         }
+
+        //Insert into takes for each student
+        $stmt = $dbh->query('SELECT stu_id FROM student');
+        foreach ($stmt as $row) {
+            @$stu_id = $row[0];
+            $stmt = $dbh->prepare('INSERT INTO takes(stu_id, exam_name) VALUES(:stu_id,:examName)');
+            $stmt->execute(array(':examName' => $name, ':stu_id' => $stu_id));
+        }
+
         $dbh->commit();
         header('Content-Type: application/json;charset=utf-8');
         echo json_encode('{success:true}');
@@ -76,7 +85,7 @@ if (isset($isPost)) {
                 </div>
                 <br><br>
                 <label for="qPoints" class="strong">Point value: </label>
-                <input id="qPoints" type="text" ng-keypress="block($event)" ng-model="question.points"/>
+                <input id="qPoints" type="text" digits-only ng-keypress="block($event)" ng-model="question.points"/>
                 <br>
                 <div id="questionContents" class="tab">
                     <div class="newControls">
@@ -153,7 +162,6 @@ if (isset($isPost)) {
                 if (name.length > 40) {
                     alert('The Quiz name is too long, please use less than 40 characters. You are currently at ' + name.length + ' characters.');
                 } else {
-
                     var request = $http({
                         method: 'post',
                         url: 'createQuiz.php',
@@ -291,8 +299,19 @@ if (isset($isPost)) {
                     if (this.value.length === limit) e.preventDefault();
                 });
             }
-        }
-    }]);
+        };
+    }]).directive('digitsOnly', function() {
+        return {
+            require: 'ngModel',
+            link: function link(scope, element, attrs, ngModel) {
+                ngModel.$parsers.push(function(value) {
+                    var numbers = value.replace(/\D/g, '');
+                    element.val(numbers);
+                    return numbers;
+                });
+            }
+        };
+    });
 
 </script>
 </html>

@@ -5,32 +5,68 @@
  * Date: 12/4/2018
  * Time: 4:07 PM
  */
+session_start();
 
-$postData = file_get_contents("php://input");
-$request = json_decode($postData);
-@$isPost = $request->isPost;
+if (isset($_SESSION['Instructor'])) {
+    if ($_SESSION['Instructor'] == true) {
+        $postData = file_get_contents("php://input");
+        $request = json_decode($postData);
+        @$isPost = $request->isPost;
 
-if (isset($isPost)) {
-    try {
-        $config = parse_ini_file("db.ini");
-        $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
-        $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        if ($isPost == 'true') {
-            $data = ['quizzes' => array(), 'students' => array()];
-            foreach ($dbh->query('SELECT name,  DATE_FORMAT(createdOn,\'%c/%e/%y at %h:%i:%s %p\') createdOn, tot_points FROM exam') as $row) {
-                array_push($data['quizzes'], ['name' => $row[0], 'createdOn' => $row[1], 'tot_points' => $row[2]]);
+        if (isset($isPost)) {
+            try {
+                $config = parse_ini_file("db.ini");
+                $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
+                $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                if ($isPost == 'true') {
+                    $data = ['quizzes' => array(), 'students' => array()];
+                    foreach ($dbh->query('SELECT name,  DATE_FORMAT(createdOn,\'%c/%e/%y at %h:%i:%s %p\') createdOn, tot_points FROM exam') as $row) {
+                        array_push($data['quizzes'], ['name' => $row[0], 'createdOn' => $row[1], 'tot_points' => $row[2]]);
+                    }
+                    foreach ($dbh->query('SELECT stu_id, major, name from student') as $row) {
+                        array_push($data['students'], ['stu_id' => $row[0], 'major' => $row[1], 'name' => $row[2]]);
+                    }
+                    header('Content-Type: application/json;charset=utf-8');
+                    echo json_encode($data);
+                    die();
+                }
+            } catch (PDOException $e) {
+                print "Error!" . $e->getMessage() . "</br>";
+                die();
             }
-            foreach ($dbh->query('SELECT stu_id, major, name from student') as $row) {
-                array_push($data['students'], ['stu_id' => $row[0], 'major' => $row[1], 'name' => $row[2]]);
-            }
-            header('Content-Type: application/json;charset=utf-8');
-            echo json_encode($data);
-            die();
         }
-    } catch (PDOException $e) {
-        print "Error!" . $e->getMessage() . "</br>";
-        die();
+    } else {
+        $postData = file_get_contents("php://input");
+        $request = json_decode($postData);
+        @$isPost = $request->isPost;
+        $stu_id = $_SESSION['id'];
+
+        if (isset($isPost)) {
+            try {
+                $config = parse_ini_file("db.ini");
+                $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
+                $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                if ($isPost == 'true') {
+                    $data = ['quizzes' => array(), 'grades' => array()];
+                    foreach ($dbh->query('SELECT name,  DATE_FORMAT(createdOn,\'%c/%e/%y at %h:%i:%s %p\') createdOn, tot_points FROM exam') as $row) {
+                        array_push($data['quizzes'], ['name' => $row[0], 'createdOn' => $row[1], 'tot_points' => $row[2]]);
+                    }
+                    foreach ($dbh->query("SELECT name,  DATE_FORMAT(createdOn,'%c/%e/%y at %h:%i:%s %p') createdOn, tot_points, grade FROM exam join takes t on exam.name = t.exam_name WHERE stu_id = $stu_id") as $row) {
+                        array_push($data['grades'], ['name' => $row[0], 'createdOn' => $row[1] ,'tot_points' => $row[2], 'grade' => $row[3]]);
+                    }
+                    header('Content-Type: application/json;charset=utf-8');
+                    echo json_encode($data);
+                    die();
+                }
+            } catch (PDOException $e) {
+                print "Error!" . $e->getMessage() . "</br>";
+                die();
+            }
+        }
     }
+} else {
+    header("Location: login.php");
+    die();
 }
 ?>
 <!DOCTYPE html>
@@ -78,7 +114,7 @@ if (isset($isPost)) {
         </tr>
     </table>
 </div>
-<div class="students tableDivs" id="students" hidden >
+<div class="students tableDivs" id="students" hidden>
     <table class="table" border="1px">
         <tr>
             <th>Name</th>
