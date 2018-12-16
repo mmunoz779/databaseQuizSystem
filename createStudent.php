@@ -22,6 +22,15 @@ if (isset($isPost)) {
 
         $stmt = $dbh->prepare('INSERT INTO student(stu_id,name,major,password) VALUES(:stu_id, :name,:major,:pass)');
         $stmt->execute(array(':stu_id' => $id, ':name' => $name, ':major' => $major, ':pass' => md5($pwd) ));
+
+        //Insert into takes for each student
+        $stmt = $dbh->query('SELECT name FROM exam');
+        foreach ($stmt as $row) {
+            @$examName = $row[0];
+            $stmt = $dbh->prepare('INSERT INTO takes(stu_id, exam_name) VALUES(:stu_id,:examName)');
+            $stmt->execute(array(':examName' => $examName, ':stu_id' => $id));
+        }
+
         $dbh->commit();
         header('Content-Type: application/json;charset=utf-8');
         echo json_encode('{success:true}');
