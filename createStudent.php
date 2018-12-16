@@ -20,8 +20,8 @@ if (isset($isPost)) {
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $dbh->beginTransaction();
 
-        $stmt = $dbh->prepare('INSERT INTO student(stu_id,name,major,password) VALUES(:studentID,:studentName,:studentMajor,:password)');
-        $stmt->execute(array('stu_id' => $id, ':name' => $name, 'major' => $major, 'password' => password_hash($pwd,PASSWORD_DEFAULT) ));
+        $stmt = $dbh->prepare('INSERT INTO student(stu_id,name,major,password) VALUES(:stu_id, :name,:major,:pass)');
+        $stmt->execute(array(':stu_id' => $id, ':name' => $name, ':major' => $major, ':pass' => md5($pwd) ));
         $dbh->commit();
         header('Content-Type: application/json;charset=utf-8');
         echo json_encode('{success:true}');
@@ -60,8 +60,7 @@ if (isset($isPost)) {
     <label>{{studentName.length || 0}} / 20 characters</label>
     <br>
     <label for="studentMajor">Student Major: </label>
-    <input limit-to="30" type="text" placeholder="Enter the student's major here" id="studentMajor"
-           ng-model="studentMajor"/>
+    <input limit-to="30" type="text" placeholder="Enter the student's major here" id="studentMajor" ng-model="studentMajor"/>
     <label>{{studentMajor.length || 0}} / 30 characters</label>
     <br>
     <label for="tempPassword">Initial Password: </label>
@@ -69,7 +68,6 @@ if (isset($isPost)) {
     <br>
     <label for="retypePassword">Retype Password: </label>
     <input type="password" placeholder="Retype password here" id="retypePassword" ng-model="tempPassword"/>
-</form>
 
 <div class="navigationButtonDiv">
     <br>
@@ -77,6 +75,7 @@ if (isset($isPost)) {
     <button class="cancel rounded" type="button" name="cancel" onclick="window.location.href='dashboard.php'">Cancel
     </button>
 </div>
+</form>
 </body>
 
 <script>
