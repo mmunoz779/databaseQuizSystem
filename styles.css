@@ -55,3 +55,10 @@ html, body {
     justify-content: center;
     text-align: center;
 }
+
+.logout {
+    position: relative;
+    bottom: 50px;
+    right: 50px;
+
+}

@@ -21,7 +21,7 @@ if (isset($isPost)) {
         $dbh->beginTransaction();
 
         $stmt = $dbh->prepare('INSERT INTO student(stu_id,name,major,password) VALUES(:stu_id, :name,:major,:pass)');
-        $stmt->execute(array(':stu_id' => $id, ':name' => $name, ':major' => $major, ':pass' => md5($pwd) ));
+        $stmt->execute(array(':stu_id' => $id, ':name' => $name, ':major' => $major, ':pass' => md5($pwd)));
 
         //Insert into takes for each student
         $stmt = $dbh->query('SELECT name FROM exam');

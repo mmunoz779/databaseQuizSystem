@@ -132,6 +132,7 @@ if (isset($_SESSION['Instructor'])) {
         </tr>
     </table>
 </div>
+<button class="logout cancel rounded">Logout</button>
 <script>
     var app = angular.module('dashboardApp', []);
     app.controller('dashboardController', ($scope, $http) => {

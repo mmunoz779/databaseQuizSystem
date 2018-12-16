@@ -27,7 +27,7 @@ if (isset($_SESSION["loggedin"])) {
             $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             foreach ($dbh->query('SELECT stu_id, password from student') as $row) {
-                if ($username == $row[0] && ($password == md5($row[1]))) {
+                if ($username == $row[0] && (md5($password) == $row[1])) {
                     $_SESSION["loggedin"] = true;
                     $_SESSION["Instructor"] = false;
                     $_SESSION['id'] = $username;
