@@ -52,7 +52,7 @@ if (isset($_SESSION['Instructor'])) {
                         array_push($data['quizzes'], ['name' => $row[0], 'createdOn' => $row[1], 'tot_points' => $row[2]]);
                     }
                     foreach ($dbh->query("SELECT name,  DATE_FORMAT(createdOn,'%c/%e/%y at %h:%i:%s %p') createdOn, tot_points, grade FROM exam join takes t on exam.name = t.exam_name WHERE stu_id = $stu_id") as $row) {
-                        array_push($data['grades'], ['name' => $row[0], 'createdOn' => $row[1] ,'tot_points' => $row[2], 'grade' => $row[3]]);
+                        array_push($data['grades'], ['name' => $row[0], 'createdOn' => $row[1], 'tot_points' => $row[2], 'grade' => $row[3]]);
                     }
                     header('Content-Type: application/json;charset=utf-8');
                     echo json_encode($data);
@@ -132,7 +132,9 @@ if (isset($_SESSION['Instructor'])) {
         </tr>
     </table>
 </div>
-<button class="logout cancel rounded">Logout</button>
+<div class="logoutDiv">
+    <button class="logout cancel rounded" onclick="window.location.href='logout.php'">Logout</button>
+</div>
 <script>
     var app = angular.module('dashboardApp', []);
     app.controller('dashboardController', ($scope, $http) => {
@@ -154,7 +156,7 @@ if (isset($_SESSION['Instructor'])) {
 
         $scope.view = (student) => {
             window.location.href = 'student.php?student=' + student.stu_id + '&name=' + student.name;
-        }
+        };
     });
 
     function createButton(tabName) {

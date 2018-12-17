@@ -6,6 +6,15 @@
  * Time: 4:14 PM
  */
 
+session_start();
+
+if (isset($_SESSION['Instructor'])) {
+
+} else {
+    header('Location: login.php');
+    die();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

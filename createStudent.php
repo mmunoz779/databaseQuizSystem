@@ -13,34 +13,40 @@ $request = json_decode($postData);
 @$pwd = $request->tempPass;
 @$id = $request->id;
 
-if (isset($isPost)) {
-    try {
-        $config = parse_ini_file("db.ini");
-        $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
-        $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $dbh->beginTransaction();
 
-        $stmt = $dbh->prepare('INSERT INTO student(stu_id,name,major,password) VALUES(:stu_id, :name,:major,:pass)');
-        $stmt->execute(array(':stu_id' => $id, ':name' => $name, ':major' => $major, ':pass' => md5($pwd)));
+if (isset($_SESSION['Instructor'])) {
+    if (isset($isPost)) {
+        try {
+            $config = parse_ini_file("db.ini");
+            $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
+            $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $dbh->beginTransaction();
 
-        //Insert into takes for each student
-        $stmt = $dbh->query('SELECT name FROM exam');
-        foreach ($stmt as $row) {
-            @$examName = $row[0];
-            $stmt = $dbh->prepare('INSERT INTO takes(stu_id, exam_name) VALUES(:stu_id,:examName)');
-            $stmt->execute(array(':examName' => $examName, ':stu_id' => $id));
+            $stmt = $dbh->prepare('INSERT INTO student(stu_id,name,major,password) VALUES(:stu_id, :name,:major,:pass)');
+            $stmt->execute(array(':stu_id' => $id, ':name' => $name, ':major' => $major, ':pass' => md5($pwd)));
+
+            //Insert into takes for each student
+            $stmt = $dbh->query('SELECT name FROM exam');
+            foreach ($stmt as $row) {
+                @$examName = $row[0];
+                $stmt = $dbh->prepare('INSERT INTO takes(stu_id, exam_name) VALUES(:stu_id,:examName)');
+                $stmt->execute(array(':examName' => $examName, ':stu_id' => $id));
+            }
+
+            $dbh->commit();
+            header('Content-Type: application/json;charset=utf-8');
+            echo json_encode('{success:true}');
+            die();
+        } catch (PDOException $e) {
+            $dbh->rollBack();
+            header('Content-Type: html/text');
+            print "<br>Error!" . $e->getMessage() . "</br>";
+            die();
         }
-
-        $dbh->commit();
-        header('Content-Type: application/json;charset=utf-8');
-        echo json_encode('{success:true}');
-        die();
-    } catch (PDOException $e) {
-        $dbh->rollBack();
-        header('Content-Type: html/text');
-        print "<br>Error!" . $e->getMessage() . "</br>";
-        die();
     }
+} else {
+    header('Location: login.php');
+    die();
 }
 ?>
 
@@ -69,7 +75,8 @@ if (isset($isPost)) {
     <label>{{studentName.length || 0}} / 20 characters</label>
     <br>
     <label for="studentMajor">Student Major: </label>
-    <input limit-to="30" type="text" placeholder="Enter the student's major here" id="studentMajor" ng-model="studentMajor"/>
+    <input limit-to="30" type="text" placeholder="Enter the student's major here" id="studentMajor"
+           ng-model="studentMajor"/>
     <label>{{studentMajor.length || 0}} / 30 characters</label>
     <br>
     <label for="tempPassword">Initial Password: </label>
@@ -78,12 +85,12 @@ if (isset($isPost)) {
     <label for="retypePassword">Retype Password: </label>
     <input type="password" placeholder="Retype password here" id="retypePassword" ng-model="tempPassword"/>
 
-<div class="navigationButtonDiv">
-    <br>
-    <button name="create" class="publish rounded" type="submit">Create</button>
-    <button class="cancel rounded" type="button" name="cancel" onclick="window.location.href='dashboard.php'">Cancel
-    </button>
-</div>
+    <div class="navigationButtonDiv">
+        <br>
+        <button name="create" class="publish rounded" type="submit">Create</button>
+        <button class="cancel rounded" type="button" name="cancel" onclick="window.location.href='dashboard.php'">Cancel
+        </button>
+    </div>
 </form>
 </body>
 

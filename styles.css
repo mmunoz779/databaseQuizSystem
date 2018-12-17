@@ -56,9 +56,14 @@ html, body {
     text-align: center;
 }
 
+.logoutDiv {
+    float: right;
+    bottom: 50px;
+    right:50px;
+}
+
 .logout {
-    position: relative;
+    position: absolute;
     bottom: 50px;
     right: 50px;
-
 }

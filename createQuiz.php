@@ -6,50 +6,56 @@ $request = json_decode($postData);
 @$questions = $request->questions;
 @$totalPoints = $request->totalPoints;
 
-if (isset($isPost)) {
-    try {
-        $config = parse_ini_file("db.ini");
-        $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
-        $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $dbh->beginTransaction();
 
-        $stmt = $dbh->prepare('INSERT INTO exam(name,createdOn,tot_points) VALUES(:examName,CURRENT_TIMESTAMP(),:totalPoints)');
-        $stmt->execute(array(':examName' => $name, ':totalPoints' => $totalPoints));
+if (isset($_SESSION['Instructor'])) {
+    if (isset($isPost)) {
+        try {
+            $config = parse_ini_file("db.ini");
+            $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
+            $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $dbh->beginTransaction();
 
-        foreach ($questions as $question) {
-            @$choices = $question->choices;
-            @$points = $question->points;
-            @$qnum = $question->identifier;
-            @$text = $question->text;
-            $stmt = $dbh->prepare('INSERT INTO question(number, text,points,exam_name) VALUES(:qnum,:txt,:points,:examName)');
-            $stmt->execute(array(':qnum' => $qnum, ':points' => $points, ':examName' => $name, ':txt' => $text));
-            foreach ($choices as $choice) {
-                @$text = $choice->text;
-                @$correct = $choice->correct;
-                @$identifier = $choice->identifier;
-                $stmt = $dbh->prepare('INSERT INTO choice(identifier,text,correct,exam_name,qnum) VALUES(:identifier,:txt,:correct,:examName,:qnum)');
-                $stmt->execute(array(':examName' => $name, ':identifier' => $identifier, ':qnum' => $qnum, ':txt' => $text, ':correct' => $correct));
+            $stmt = $dbh->prepare('INSERT INTO exam(name,createdOn,tot_points) VALUES(:examName,CURRENT_TIMESTAMP(),:totalPoints)');
+            $stmt->execute(array(':examName' => $name, ':totalPoints' => $totalPoints));
+
+            foreach ($questions as $question) {
+                @$choices = $question->choices;
+                @$points = $question->points;
+                @$qnum = $question->identifier;
+                @$text = $question->text;
+                $stmt = $dbh->prepare('INSERT INTO question(number, text,points,exam_name) VALUES(:qnum,:txt,:points,:examName)');
+                $stmt->execute(array(':qnum' => $qnum, ':points' => $points, ':examName' => $name, ':txt' => $text));
+                foreach ($choices as $choice) {
+                    @$text = $choice->text;
+                    @$correct = $choice->correct;
+                    @$identifier = $choice->identifier;
+                    $stmt = $dbh->prepare('INSERT INTO choice(identifier,text,correct,exam_name,qnum) VALUES(:identifier,:txt,:correct,:examName,:qnum)');
+                    $stmt->execute(array(':examName' => $name, ':identifier' => $identifier, ':qnum' => $qnum, ':txt' => $text, ':correct' => $correct));
+                }
             }
-        }
 
-        //Insert into takes for each student
-        $stmt = $dbh->query('SELECT stu_id FROM student');
-        foreach ($stmt as $row) {
-            @$stu_id = $row[0];
-            $stmt = $dbh->prepare('INSERT INTO takes(stu_id, exam_name) VALUES(:stu_id,:examName)');
-            $stmt->execute(array(':examName' => $name, ':stu_id' => $stu_id));
-        }
+            //Insert into takes for each student
+            $stmt = $dbh->query('SELECT stu_id FROM student');
+            foreach ($stmt as $row) {
+                @$stu_id = $row[0];
+                $stmt = $dbh->prepare('INSERT INTO takes(stu_id, exam_name) VALUES(:stu_id,:examName)');
+                $stmt->execute(array(':examName' => $name, ':stu_id' => $stu_id));
+            }
 
-        $dbh->commit();
-        header('Content-Type: application/json;charset=utf-8');
-        echo json_encode('{success:true}');
-        die();
-    } catch (PDOException $e) {
-        $dbh->rollBack();
-        header('Content-Type: html/text');
-        print "<br>Error!" . $e->getMessage() . "</br>";
-        die();
+            $dbh->commit();
+            header('Content-Type: application/json;charset=utf-8');
+            echo json_encode('{success:true}');
+            die();
+        } catch (PDOException $e) {
+            $dbh->rollBack();
+            header('Content-Type: html/text');
+            print "<br>Error!" . $e->getMessage() . "</br>";
+            die();
+        }
     }
+} else {
+    header('Location: login.php');
+    die();
 }
 ?>
 <!DOCTYPE html>
@@ -300,11 +306,11 @@ if (isset($isPost)) {
                 });
             }
         };
-    }]).directive('digitsOnly', function() {
+    }]).directive('digitsOnly', function () {
         return {
             require: 'ngModel',
             link: function link(scope, element, attrs, ngModel) {
-                ngModel.$parsers.push(function(value) {
+                ngModel.$parsers.push(function (value) {
                     var numbers = value.replace(/\D/g, '');
                     element.val(numbers);
                     return numbers;
