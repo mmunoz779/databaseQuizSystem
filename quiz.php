@@ -11,43 +11,25 @@ $postData = file_get_contents("php://input");
 $request = json_decode($postData);
 @$isPost = $request->isPost;
 
-if (isset($isPost)) {
-    try {
-        $config = parse_ini_file("db.ini");
-        $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
-        $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        if ($isPost == 'true') {
-            $data = ['quizzes' => array(), 'students' => array()];
-            foreach ($dbh->query('SELECT name,  DATE_FORMAT(createdOn,\'%c/%e/%y at %h:%i:%s %p\') createdOn, tot_points FROM exam') as $row) {
-                array_push($data['quizzes'], ['name' => $row[0], 'createdOn' => $row[1], 'tot_points' => $row[2]]);
-            }
-            foreach ($dbh->query('SELECT stu_id, major, name from student') as $row) {
-                array_push($data['students'], ['stu_id' => $row[0], 'major' => $row[1], 'name' => $row[2]]);
-            }
-            header('Content-Type: application/json;charset=utf-8');
-            echo json_encode($data);
-            die();
-        }
-    } catch (PDOException $e) {
-        print "Error!" . $e->getMessage() . "</br>";
-        die();
-    }
-}
 if ($_POST['name']) {
-    $name = $_GET['name'];
-    $stmt = $dbh->prepare('SELECT * FROM exam join (SELECT question.exam_name, question.number, question.points, question.text questionText, choice.text choiceText, choice.correct, choice.identifier '
-        . 'FROM question join choice on question.exam_name = choice.exam_name and question.number = choice.qnum) questions on questions.exam_name = exam.name'
-        . ' WHERE exam.name = :name');
-    $stmt->execute(array(':name' => $name));
-    $data = ['questions' => ['choices' => array()]];
-    foreach ($stmt as $row) {
-        if(in_array($data['questions']))
-        array_push($data['questions'], );
-        array_push($data['students'], ['stu_id' => $row[0], 'major' => $row[1], 'name' => $row[2]]);
+    try {
+        $name = $_GET['name'];
+        $stmt = $dbh->prepare('SELECT * FROM exam join (SELECT question.exam_name, question.number, question.points, question.text questionText, choice.text choiceText, choice.correct, choice.identifier '
+            . 'FROM question join choice on question.exam_name = choice.exam_name and question.number = choice.qnum) questions on questions.exam_name = exam.name'
+            . ' WHERE exam.name = :name');
+        $stmt->execute(array(':name' => $name));
+        $data = ['questions' => ['choices' => array()]];
+        foreach ($stmt as $row) {
+            if (in_array($data['questions']))
+                array_push($data['questions'], );
+            array_push($data['students'], ['stu_id' => $row[0], 'major' => $row[1], 'name' => $row[2]]);
+        }
+        header('Content-Type: application/json;charset=utf-8');
+        echo json_encode($data);
+        die();
+    } catch (PDOException $e) {
+        echo 'ERROR:' . $e;
     }
-    header('Content-Type: application/json;charset=utf-8');
-    echo json_encode($data);
-    die();
 } elseif ($_GET['name']) {
 
 } else {

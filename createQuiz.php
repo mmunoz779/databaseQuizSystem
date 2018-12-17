@@ -6,6 +6,7 @@ $request = json_decode($postData);
 @$questions = $request->questions;
 @$totalPoints = $request->totalPoints;
 
+session_start();
 
 if (isset($_SESSION['Instructor'])) {
     if (isset($isPost)) {

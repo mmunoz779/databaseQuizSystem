@@ -13,6 +13,7 @@ $request = json_decode($postData);
 @$pwd = $request->tempPass;
 @$id = $request->id;
 
+session_start();
 
 if (isset($_SESSION['Instructor'])) {
     if (isset($isPost)) {
