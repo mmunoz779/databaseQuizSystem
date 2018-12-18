@@ -31,7 +31,7 @@ if (isset($_SESSION["loggedin"])) {
                 if ($username == $row[0] && (md5($password) == $row[1])) {
                     $_SESSION["loggedin"] = true;
                     $_SESSION["Instructor"] = false;
-                    $_SESSION['user'] = ['stuId' => $username, 'name' => $row[2]];
+                    $_SESSION['user'] = array('stuId' => $username, 'name' => $row[2]);
 
                     header("Location: dashboard.php");
                     die();

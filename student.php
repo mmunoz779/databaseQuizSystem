@@ -22,7 +22,10 @@
     <?php
 
     session_start();
-
+if($_GET['student']!=$_SESSION['user']['stuId']){
+    header('Location: dashboard.php');
+    die();
+}
     if (isset($_SESSION['Instructor'])) {
         if (isset($_GET['student'])) {
             $config = parse_ini_file("db.ini");

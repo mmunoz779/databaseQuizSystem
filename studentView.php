@@ -8,7 +8,7 @@
 session_start();
 
 if (isset($_SESSION['Instructor'])) {
-    if ($_SESSION['Instructor'] == true) {
+    if ($_SESSION['Instructor'] == false) {
         $postData = file_get_contents("php://input");
         $request = json_decode($postData);
         @$isPost = $request->isPost;
@@ -36,7 +36,7 @@ if (isset($_SESSION['Instructor'])) {
             }
         }
     } else {
-        header('Location: studentView.php');
+        header('Location: dashboard.php');
         die();
     }
 } else {
@@ -60,17 +60,17 @@ if (isset($_SESSION['Instructor'])) {
 <div class="buttons">
     <ul class="buttons">
         <li class="create">
-            <button id="createButton" class="create" onclick="window.location.href='createQuiz.php'">+</button>
-            <label for="createButton" class="create" id="createLabel"></label>
+            <!--Fixed the height problem-->
+            <br>
         </li>
         <li class="quizToggle">
             <button class="toggleButton" id="defaultOpen" onclick="openTab('quizzes')">
-                Quizzes
+                To Do
             </button>
         </li>
         <li class="studentToggle">
-            <button class="toggleButton" onclick="openTab('students')">
-                Students
+            <button class="toggleButton" ng-click="view()">
+                Grades
             </button>
         </li>
     </ul>
@@ -81,15 +81,19 @@ if (isset($_SESSION['Instructor'])) {
             <th>Quiz Name</th>
             <th>Created On</th>
             <th>Total Points</th>
+            <th>Take Quiz?</th>
         </tr>
         <tr ng-repeat="quiz in quizzes">
             <td>{{quiz.name}}</td>
             <td>{{quiz.createdOn}}</td>
             <td>{{quiz.tot_points}}</td>
+            <td>
+                <button type="button" ng-click=go(quiz)>Go!</button>
+            </td>
         </tr>
     </table>
 </div>
-<div class="students tableDivs" id="students" hidden>
+<div class="grades tableDivs" id="students" hidden>
     <table class="table" border="1px">
         <tr>
             <th>Name</th>
@@ -111,10 +115,10 @@ if (isset($_SESSION['Instructor'])) {
     <button class="logout cancel rounded" onclick="window.location.href='logout.php'">Logout</button>
 </div>
 <script>
-    var app = angular.module('dashboardApp', []);
-    app.controller('dashboardController', ($scope, $http) => {
+    var app = angular.module('dashboardApp',[]);
+    app.controller('dashboardController', ($scope, $http, $location) => {
         var quizReq = $http({
-            url: 'dashboard.php',
+            url: 'studentView.php',
             data: {
                 isPost: 'true'
             },
@@ -129,44 +133,33 @@ if (isset($_SESSION['Instructor'])) {
             console.log('POST Error');
         });
 
-        $scope.view = (student) => {
-            window.location.href = 'student.php?student=' + student.stu_id + '&name=' + student.name;
+        $scope.view = () => {
+            $http.get('getUserData.php').success((user)=>{
+                $scope.user=user;
+                var stuId = $scope.user.stuId;
+                var name = $scope.user.name;
+                window.location.href = 'student.php?student=' + stuId + '&name=' + name;
+            });
+
+        };
+        $scope.go = (quiz) => {
+            window.location.href = 'quiz.php?name=' + quiz.name;
         };
     });
-
-    function createButton(tabName) {
-        if (tabName == "Quiz") {
-            window.location.href = 'createQuiz.php';
-        } else {
-            window.location.href = 'createStudent.php';
-        }
-    }
 
     function openTab(tabName) {
         switch (tabName) {
             case "quizzes":
                 document.getElementById("quizzes").hidden = false;
                 document.getElementById("students").hidden = true;
-                document.getElementById("createLabel").innerHTML = "Create New Quiz";
-                document.getElementById("createButton").onclick = function () {
-                    createButton("Quiz");
-                };
                 break;
             case "students":
                 document.getElementById("students").hidden = false;
                 document.getElementById("quizzes").hidden = true;
-                document.getElementById("createLabel").innerHTML = "Create New Student";
-                document.getElementById("createButton").onclick = function () {
-                    createButton("Student");
-                };
                 break;
             default:
                 document.getElementById("quizzes").hidden = false;
                 document.getElementById("students").hidden = true;
-                document.getElementById("createLabel").innerHTML = "Create New Quiz";
-                document.getElementById("createButton").onclick = function () {
-                    createButton("Quiz");
-                };
                 break;
         }
     }
