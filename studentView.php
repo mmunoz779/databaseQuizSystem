@@ -60,8 +60,7 @@ if (isset($_SESSION['Instructor'])) {
 <div class="buttons">
     <ul class="buttons">
         <li class="create">
-            <!--Fixed the height problem-->
-            <br>
+            <button id="changePass" onclick="window.location.href='changePass.php'">Change Password</button>
         </li>
         <li class="quizToggle">
             <button class="toggleButton" id="defaultOpen" onclick="openTab('quizzes')">
