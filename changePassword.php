@@ -94,8 +94,7 @@ if (isset($_SESSION['Instructor'])) {
                     header: {'Content-Type': 'application/x-www-form-urlencoded'}
                 });
                 request.success((response)=> {
-                    console.log(response);
-                    //window.location.href = 'studentView.php?success=true';
+                    window.location.href = 'studentView.php?success=true';
                 });
             }
         };
