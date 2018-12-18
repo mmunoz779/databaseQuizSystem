@@ -8,7 +8,6 @@ body {
     color: #FFF;
 }
 
-
 /* nav bar stylings*/
 ul {
     position: -webkit-sticky; /* Safari */
@@ -33,14 +32,26 @@ li.quizToggle {
     position: absolute;
     left: 5px;
 }
+
 li.studentToggle {
     position: absolute;
     left: 106px;
 }
 
+li.changePass {
+    float: right;
+    padding-right: 5px;
+}
+
+li button.changePass {
+    width: 150px;
+    background-color: #AAA;
+    color:#FFF;
+}
+
 li.create {
     width: 80%;
-    float:right;
+    float: right;
     padding-right: 5px;
     vertical-align: center;
     text-align: center;

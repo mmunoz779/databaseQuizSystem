@@ -59,8 +59,8 @@ if (isset($_SESSION['Instructor'])) {
 <h1><b>My Dashboard</b></h1>
 <div class="buttons">
     <ul class="buttons">
-        <li class="create">
-            <button id="changePass" onclick="window.location.href='changePass.php'">Change Password</button>
+        <li class="changePass">
+            <button id="changePass" class="changePass" onclick="window.location.href='changePassword.php'">Change Password</button>
         </li>
         <li class="quizToggle">
             <button class="toggleButton" id="defaultOpen" onclick="openTab('quizzes')">

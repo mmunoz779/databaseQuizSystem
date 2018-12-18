@@ -5,12 +5,13 @@
  * Date: 12/17/2018
  * Time: 10:52 PM
  */
+session_start();
+
 $postData = file_get_contents("php://input");
 $request = json_decode($postData);
 @$isPost = $request->isPost;
-@$newPass = $request->newPass;
-
-session_start();
+@$newPass = $request->pass;
+@$stu_id = $_SESSION['user']['stuId'];
 
 if (isset($_SESSION['Instructor'])) {
     if (isset($isPost)) {
@@ -20,16 +21,8 @@ if (isset($_SESSION['Instructor'])) {
             $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $dbh->beginTransaction();
 
-            $stmt = $dbh->prepare('UPDATE TABLE');
-            $stmt->execute(array(':stu_id' => $id, ':name' => $name, ':major' => $major, ':pass' => md5($pwd)));
-
-            //Insert into takes for each student
-            $stmt = $dbh->query('SELECT name FROM exam');
-            foreach ($stmt as $row) {
-                @$examName = $row[0];
-                $stmt = $dbh->prepare('INSERT INTO takes(stu_id, exam_name) VALUES(:stu_id,:examName)');
-                $stmt->execute(array(':examName' => $examName, ':stu_id' => $id));
-            }
+            $stmt = $dbh->prepare('UPDATE student SET password = :newPass WHERE stu_id = :stu_id');
+            $stmt->execute(array(':newPass' => md5($newPass), ':stu_id' => $stu_id));
 
             $dbh->commit();
             header('Content-Type: application/json;charset=utf-8');
@@ -62,10 +55,7 @@ if (isset($_SESSION['Instructor'])) {
 
 <body ng-app="submitApp">
 
-<form name="submitPass" ng-submit="submitPass()" ng-controller="submitPassController">
-    <label for="oldPass">Old Password: </label>
-    <input id="oldPass" type="password"/>
-    <br>
+<form name="submitPass" ng-submit="submitPassword()" ng-controller="submitPassController">
     <label for="newPass">New Password: </label>
     <input id="newPass" type="password"/>
     <br>
@@ -83,11 +73,11 @@ if (isset($_SESSION['Instructor'])) {
 </form>
 </body>
 <script>
-    var app = angular.modeule('submitApp',[]);
+    var app = angular.module('submitApp',[]);
     app.controller('submitPassController', ($scope, $http) => {
         $scope.newPass = "";
 
-        $scope.submitPass = () => {
+        $scope.submitPassword = () => {
 
             var newPass = document.forms['submitPass']['newPass'].value;
 
@@ -104,7 +94,8 @@ if (isset($_SESSION['Instructor'])) {
                     header: {'Content-Type': 'application/x-www-form-urlencoded'}
                 });
                 request.success((response)=> {
-                    window.location.href = 'studentView.php?success=true';
+                    console.log(response);
+                    //window.location.href = 'studentView.php?success=true';
                 });
             }
         };
