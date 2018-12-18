@@ -9,37 +9,45 @@
 session_start();
 $postData = file_get_contents("php://input");
 $request = json_decode($postData);
-@$isPost = $request->isPost;
+@$name = $request->name;
 
-if ($_POST['name']) {
+if (isset($name)) {
     try {
         $name = $_GET['name'];
+
+        $config = parse_ini_file("db.ini");
+        $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
+        $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         $stmt = $dbh->prepare('SELECT * FROM exam join (SELECT question.exam_name, question.number, question.points, question.text questionText, choice.text choiceText, choice.correct, choice.identifier '
             . 'FROM question join choice on question.exam_name = choice.exam_name and question.number = choice.qnum) questions on questions.exam_name = exam.name'
             . ' WHERE exam.name = :name');
         $stmt->execute(array(':name' => $name));
-        $data = ['questions' => ['choices' => array()]];
+        $data = ['questions' => ['choices' => ['identifier' => '', 'text' => '', 'correct' => 0], 'text' => '', 'points' => 0]];
         foreach ($stmt as $row) {
-            if (in_array($data['questions']))
-                array_push($data['questions'], );
-            array_push($data['students'], ['stu_id' => $row[0], 'major' => $row[1], 'name' => $row[2]]);
+            if (in_array($row[4], $data['questions'])) {
+                $data['questions'][$row[4]]['text'] = $row[6];
+                $data['questions'][$row[4]]['points'] = $row[5];
+                array_push($data['questions'][$row[4]]['choices'], ['identifier' => $row[9], 'text' => $row[7], 'correct' => $row[8]]);
+            }
         }
         header('Content-Type: application/json;charset=utf-8');
         echo json_encode($data);
         die();
     } catch (PDOException $e) {
         echo 'ERROR:' . $e;
+        die();
     }
 } elseif ($_GET['name']) {
+    if (isset($_SESSION['Instructor'])) {
+
+    } else {
+        header('Location: login.php');
+        die();
+    }
 
 } else {
     header('location: dashboard.php');
-}
-if (isset($_SESSION['Instructor'])) {
-
-} else {
-    header('Location: login.php');
-    die();
 }
 
 ?>
@@ -57,8 +65,8 @@ if (isset($_SESSION['Instructor'])) {
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
 </head>
-<body>
-<div class="questions" id="questionHolder">
+<body ng-app="quizApp">
+<div class="questions" id="questionHolder" ng-controller="quizController">
     <ul>
         <li ng-repeat="question in questions">
             <div class="questionInfo">
@@ -104,11 +112,28 @@ if (isset($_SESSION['Instructor'])) {
 </body>
 <script>
     var app = angular.module('quizApp', []);
-    app.controller('quizController', function ($scope, $http) {
-        var req = $http({
-            url: 'getQuizzes.php',
 
+    app.controller('quizController',function ($scope, $http, $location) {
+
+        var name = $location.absUrl().split('?')[1].split('ame=')[1].split('%20').join(' ');
+
+        var request = $http({
+            method: 'post',
+            url: 'quiz.php',
+            data: {
+                name: name
+            },
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         });
+
+        request.success((response) => {
+            console.log(response);
+        });
+
+        request.error((response) => {
+            console.log('ERROR:\n' + response);
+        });
+
     });
 </script>
 </html>

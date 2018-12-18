@@ -17,6 +17,7 @@ if (isset($_SESSION["loggedin"])) {
         if ($_POST["userid"] == "Houghton" && $_POST["password"] == "snow") {
             $_SESSION["loggedin"] = true;
             $_SESSION["Instructor"] = true;
+            $_SESSION["user"] = ['stuId' => 'INVALID', 'name' => 'Instructor'];
             header("Location: dashboard.php");
             exit;
         } else {
@@ -26,11 +27,12 @@ if (isset($_SESSION["loggedin"])) {
             $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
             $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            foreach ($dbh->query('SELECT stu_id, password from student') as $row) {
+            foreach ($dbh->query('SELECT stu_id, password, name from student') as $row) {
                 if ($username == $row[0] && (md5($password) == $row[1])) {
                     $_SESSION["loggedin"] = true;
                     $_SESSION["Instructor"] = false;
-                    $_SESSION['id'] = $username;
+                    $_SESSION['user'] = ['stuId' => $username, 'name' => $row[2]];
+
                     header("Location: dashboard.php");
                     die();
                 }
