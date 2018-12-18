@@ -22,7 +22,7 @@
     <?php
 
     session_start();
-    if ($_GET['student'] != $_SESSION['user']['stuId']) {
+    if ($_GET['student'] != $_SESSION['user']['stuId'] && !$_SESSION['Instructor']) {
         header('Location: dashboard.php');
         die();
     }
@@ -53,7 +53,7 @@
 
             echo "</table><br>";
 
-            $percent = ($total_score / ($total_possible == 0 ? 1 : $total_possible)) * 100;
+            $percent = number_format(($total_score / ($total_possible == 0 ? 1 : $total_possible)) * 100, 2, '.', '');
 
             $percent = ($total_score == 0 && $total_possible == 0) ? '--' : $percent;
 

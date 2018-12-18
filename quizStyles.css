@@ -1,4 +1,9 @@
 li {
     list-style: none;
+}
 
+.dashboard {
+    background-color: #00AA00;
+    width: auto;
+    border: #00AA00;
 }
