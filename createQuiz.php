@@ -280,6 +280,9 @@ if (isset($_SESSION['Instructor'])) {
                     q.choices = q.choices.filter((currElement) => {
                         return currElement !== c;
                     });
+                    q.choices.forEach((choice) => {
+                        choice.identifier = q.choices.findIndex(ch => ch===choice);
+                    });
                 }
             };
             // Prevent enter in points from deleting choices

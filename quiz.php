@@ -23,12 +23,16 @@ if (isset($name)) {
             . 'FROM question join choice on question.exam_name = choice.exam_name and question.number = choice.qnum) questions on questions.exam_name = exam.name'
             . ' WHERE exam.name = :name');
         $stmt->execute(array(':name' => $name));
-        $data = ['questions' => ['choices' => ['identifier' => '', 'text' => '', 'correct' => 0], 'text' => '', 'points' => 0]];
+        $data = ['questions' => array()];
         foreach ($stmt as $row) {
-            if (in_array($row[4], $data['questions'])) {
+            if (isset($data['questions'][$row[4]])) {
                 $data['questions'][$row[4]]['text'] = $row[6];
                 $data['questions'][$row[4]]['points'] = $row[5];
-                array_push($data['questions'][$row[4]]['choices'], ['identifier' => $row[9], 'text' => $row[7], 'correct' => $row[8]]);
+                array_push($data['questions'][$row[4]]['choices'], ['identifier' => $row[9], 'text' => $row[7], 'correct' => $row[8], 'selected' => false]);
+            } else {
+                $newArr = ['choices' => array(), 'text' => $row[6], 'points' => $row[5]];
+                $data['questions'][$row[4]] = $newArr;
+                array_push($data['questions'][$row[4]]['choices'], ['identifier' => $row[9], 'text' => $row[7], 'correct' => $row[8], 'selected' => false]);
             }
         }
         header('Content-Type: application/json;charset=utf-8');
@@ -48,6 +52,7 @@ if (isset($name)) {
 
 } else {
     header('location: dashboard.php');
+    die();
 }
 
 ?>
@@ -62,64 +67,61 @@ if (isset($name)) {
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <link rel="stylesheet" href="styles.css"/>
+    <link rel="stylesheet" href="quizStyles.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
 </head>
 <body ng-app="quizApp">
-<div class="questions" id="questionHolder" ng-controller="quizController">
-    <ul>
-        <li ng-repeat="question in questions">
-            <div class="questionInfo">
-                <button class="round remove" ng-click="removeQuestion(question)">-</button>
-                <label for="questionTextInput" class="strong">Question: {{$index + 1}}</label>
-            </div>
-            <br><br>
-            <label for="qPoints" class="strong">Point value: </label>
-            <input id="qPoints" type="text" digits-only ng-keypress="block($event)" ng-model="question.points"/>
-            <br>
-            <div id="questionContents" class="tab">
-                <div class="newControls">
-                    <label for="createChoice" class="createLabel">New Choice</label>
-                    <button type="button" name="createButton" class="create round" ng-click="newChoice(question)">+
-                    </button>
+<?php
+echo '<h1>' . $_GET['name'] . '</h1>';
+?>
+<form name="quizForm" ng-controller="quizController" ng-submit="submit()">
+    <div class="questions" id="questionHolder">
+        <ul>
+            <li ng-repeat="question in questions">
+                <div class="questionInfo">
+                    <label for="questionTextInput" class="strong">Question: {{$index + 1}}</label>
                 </div>
-                <br><br>
-                <input class="questionDescription" id="questionTextInput" type="text"
-                       placeholder="Enter question's text here"
-                       ng-model="questionText" ng-init="questionText=question.text" required/>
+                <label for="qPoints" class="strong">Point value: </label>
+                <label for="qPoints" class="strong">{{isCorrect(question) ? question.points : 0}}/</label>
+                <label id="qPoints">{{question.points}}</label>
                 <br>
-                <div class="choiceHolder">
-                    <ul>
-                        <li ng-repeat="choice in question.choices">
-                            <label style="padding-right: 4px;" for="choice{{$index}}">{{getLetter($index)}}</label>
-                            <input style="padding-right: 4px;" type="text" id="choice{{$index}}"
-                                   placeholder="Enter choice text here"
-                                   ng-model="choiceText" ng-init="choiceText=choice.text" required/>
-                            <label style="padding-left: 4px;" for="isCorrect{{question.identifier}}">Correct
-                                Answer:</label>
-                            <input id="isCorrect{{question.identifier}}" ng-checked="choice.correct"
-                                   name="question{{question.identifier}}"
-                                   type="radio" ng-click="setCorrect(question,choice)"/>
-                            <button class="remove round" name="removeButton"
-                                    ng-click="removeChoice(question,choice)">-
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-        </li>
-    </ul>
-</div>
+                <br>
+                <div id="questionContents" class="tab">
+                    <label class="questionDescription" id="questionTextInput">{{question.text}}</label>
+                    <div class="choiceHolder">
+                        <ul>
+                            <li ng-repeat="choice in question.choices">
+                                <label style="padding-right: 4px;" for="choice{{$index}}">{{getLetter($index)}}</label>
+                                <label style="padding-right: 4px;" id="choice{{$index}}">{{choice.text}}</label>
+                                <input id="choice{{question.identifier}}" ng-checked="choice.selected"
+                                       name="question{{question.identifier}}"
+                                       type="radio" ng-click="choose(question,choice)"/>
+                            </li>
+                        </ul>
+                        <br>
+                    </div>
+            </li>
+        </ul>
+    </div>
+    <div class="navigationButtonDiv">
+        <br>
+        <button name="publish" class="publish rounded" type="submit">Submit</button>
+        <button class="cancel rounded" type="button" name="cancel" onclick="window.location.href='dashboard.php'">Cancel
+        </button>
+    </div>
+</form>
 </body>
 <script>
     var app = angular.module('quizApp', []);
 
-    app.controller('quizController',function ($scope, $http, $location) {
+    app.controller('quizController', function ($scope, $http, $location) {
 
         var name = $location.absUrl().split('?')[1].split('ame=')[1].split('%20').join(' ');
 
         var request = $http({
             method: 'post',
-            url: 'quiz.php',
+            url: 'quiz.php?name=' + name,
             data: {
                 name: name
             },
@@ -127,12 +129,34 @@ if (isset($name)) {
         });
 
         request.success((response) => {
-            console.log(response);
+            $scope.questions = response.questions;
         });
 
         request.error((response) => {
             console.log('ERROR:\n' + response);
         });
+
+        $scope.choose = (q, c) => {
+            q.choices.forEach((choice) => {
+                choice.selected = (choice === c);
+            });
+        };
+
+        $scope.submitted = false;
+
+        $scope.submit = () => {
+            $scope.submitted = true;
+        };
+
+        $scope.isCorrect = (q) => {
+            q.choices.forEach((choice) => {
+                if (choice.selected) {
+                    console.log(choice.correct == 1);
+                    return choice.correct == 1;
+                }
+            });
+            return false;
+        };
 
     });
 </script>

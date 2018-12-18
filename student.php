@@ -22,16 +22,16 @@
     <?php
 
     session_start();
-if($_GET['student']!=$_SESSION['user']['stuId']){
-    header('Location: dashboard.php');
-    die();
-}
+    if ($_GET['student'] != $_SESSION['user']['stuId']) {
+        header('Location: dashboard.php');
+        die();
+    }
     if (isset($_SESSION['Instructor'])) {
         if (isset($_GET['student'])) {
             $config = parse_ini_file("db.ini");
             $dbh = new PDO($config['dsn'], $config['username'], $config['password']);
             $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $stmt = $dbh->prepare("SELECT exam.name, createdOn, tot_points, grade from exam left outer join (student natural join takes) on exam_name=exam.name where stu_id=:stu_id");
+            $stmt = $dbh->prepare("SELECT exam.name, createdOn, tot_points, grade from exam LEFT OUTER join (student NATURAL join takes) on exam_name=exam.name where stu_id=:stu_id");
             $stmt->execute(array('stu_id' => $_GET['student']));
 
             $total_score = 0;
