@@ -101,17 +101,18 @@ if (isset($_SESSION['Instructor'])) {
                         </button>
                     </div>
                     <br><br>
-                    <input class="questionDescription" id="questionTextInput" type="text"
+                    <input class="questionDescription" id="questionTextInput" type="text" limit-to="255"
                            placeholder="Enter question's text here"
-                           ng-model="questionText" ng-init="questionText=question.text" required/>
+                           ng-model="question.text" ng-init="questionText=question.text" required/>
+                    <label>{{question.text.length || 0}} / 255 characters</label>
                     <br>
                     <div class="choiceHolder">
                         <ul>
                             <li ng-repeat="choice in question.choices">
                                 <label style="padding-right: 4px;" for="choice{{$index}}">{{getLetter($index)}}</label>
-                                <input style="padding-right: 4px;" type="text" id="choice{{$index}}"
+                                <input style="padding-right: 4px;" type="text" id="choice{{$index}}" limit-to="255"
                                        placeholder="Enter choice text here"
-                                       ng-model="choiceText" ng-init="choiceText=choice.text" required/>
+                                       ng-model="choice.text" ng-init="choiceText=choice.text" required/>
                                 <label style="padding-left: 4px;" for="isCorrect{{question.identifier}}">Correct
                                     Answer:</label>
                                 <input id="isCorrect{{question.identifier}}" ng-checked="choice.correct"
@@ -120,6 +121,7 @@ if (isset($_SESSION['Instructor'])) {
                                 <button class="remove round" name="removeButton"
                                         ng-click="removeChoice(question,choice)">-
                                 </button>
+                                <label> {{choice.text.length || 0}} / 255 characters</label>
                             </li>
                         </ul>
                     </div>
